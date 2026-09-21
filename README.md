@@ -13,7 +13,7 @@ generator, power supplies — behind one interface, over USB or TCP/IP.
 
 ## Folder structure
 
-```
+```are runnable 
 ming/
 ├── bench/                      the package — one interface to every instrument
 │   ├── __init__.py             Bench, Category, the REGISTRY, re-exports
@@ -25,8 +25,8 @@ ming/
 │   ├── funcgens.py             Agilent33220A
 │   ├── supplies.py             Keithley2280S, KeysightEDU36311A, SiglentSPD3000
 │   ├── discovery.py            scan() / discover() — what's on the bus
-│   ├── cli.py                  the `python3 -m bench` front end
-│   └── __main__.py             entry point for `python3 -m bench`
+│   ├── cli.py                  the `python -m bench` front end
+│   └── __main__.py             entry point for `python -m bench`
 ├── examples/                   runnable end-to-end sequences
 │   ├── funcgen_basics.py       set waveforms and read every setting back
 │   ├── scope_basics.py         set a channel up, measure it, capture it
@@ -38,7 +38,7 @@ ming/
 │   ├── hello.py                → bench/supplies.py (SiglentSPD3000)
 │   ├── osc.py                  → bench/scopes.py
 │   ├── osc_save.py             → bench/scopes.py (waveform capture)
-│   ├── osc_test.py             → `python3 -m bench check`
+│   ├── osc_test.py             → `python -m bench check`
 │   ├── supply.py               → bench/supplies.py (Keithley2280S)
 │   └── supply_ks.py            → bench/supplies.py (KeysightEDU36311A)
 ├── pynq-visa-env/              virtualenv (pyvisa, pyvisa-py, numpy, matplotlib)
@@ -61,24 +61,32 @@ measurements come back. That's why `SiglentSPD3000` is 20 lines.
 
 ## Setup
 
-### Python
+### Activate the environment
 
-`python3` on this board is the PYNQ virtualenv
-(`/usr/local/share/pynq-venv/bin/python3`) and already has everything needed
-— pyvisa 1.16.2, numpy 1.21.5, matplotlib 3.5.1. No activation, no install:
+Everything runs in this project's virtualenv, `pynq-visa-env/`. Activate it
+first, every session:
 
 ```bash
 cd /home/xilinx/ming
-python3 -m bench list
+source pynq-visa-env/bin/activate
 ```
 
-The project's own `pynq-visa-env/` works equally well if you prefer it
-(`./pynq-visa-env/bin/python -m bench list`); every command below is
-interchangeable between the two.
+The prompt picks up a `(pynq-visa-env)` prefix; `python` is now the project
+interpreter, with pyvisa 1.16.2, pyvisa-py, numpy 1.26.4 and matplotlib
+3.10.9 installed. Every command in this README assumes it's active. Check
+with:
 
-Run `python3 -m bench ...` from the project root, since that's how the
-`bench` package gets found. The scripts in `examples/` add the project root
-to `sys.path` themselves, so those run from anywhere by plain path.
+```bash
+python -m bench list
+```
+
+`deactivate` when you're done. To install anything new for this project,
+`pip install <pkg>` with the venv active — it lands in `pynq-visa-env/` and
+touches nothing else on the board.
+
+Run `python -m bench ...` from the project root, since that's how the `bench`
+package gets found. The scripts in `examples/` add the project root to
+`sys.path` themselves, so those run from anywhere by plain path.
 
 > The first run that draws a plot spends a few minutes building matplotlib's
 > font cache. It's a one-time cost.
@@ -136,9 +144,9 @@ what kind of thing it is, the model says which machine:
 ### Check the bench is alive
 
 ```bash
-python3 -m bench list     # every registered instrument and its resource string
-python3 -m bench scan     # *IDN? everything the VISA backend can currently see
-python3 -m bench check    # ping each registered instrument, PASS/FAIL per line
+python -m bench list     # every registered instrument and its resource string
+python -m bench scan     # *IDN? everything the VISA backend can currently see
+python -m bench check    # ping each registered instrument, PASS/FAIL per line
 ```
 
 `check` exits non-zero if anything doesn't answer. A USB instrument missing
@@ -268,7 +276,7 @@ crw-rw-rw- 1 root root 189, 11 ...
 ### 8. Re-run the PyVISA resource scan
 
 ```bash
-python3 -m bench scan
+python -m bench scan
 ```
 
 The new instrument should appear as a
@@ -301,7 +309,7 @@ python examples/supply_ramp.py         # enables a supply output
 python examples/sine_loopback_test.py  # both TCP/IP instruments, needs a cable
 ```
 
-`python` and `python3` both work — see [Setup](#python).
+Activate the virtualenv first — see [Setup](#activate-the-environment).
 
 **[examples/funcgen_basics.py](examples/funcgen_basics.py)** — the simplest
 one. Sets a sine, then changes frequency / amplitude / offset one at a time,
@@ -411,13 +419,13 @@ Bench(resources={'scope.sds1104x': 'TCPIP::172.24.58.99::INSTR'})
 ### From the command line
 
 ```bash
-python3 -m bench list                      # every instrument
-python3 -m bench scan                      # *IDN? every visible resource
-python3 -m bench check                     # ping all
-python3 -m bench check scope.sds1104x      # ...or just these
-python3 -m bench methods supply.keithley   # what you can call
-python3 -m bench call scope.sds1104x measure_all 4
-python3 -m bench call supply.keysight set_voltage 3.3 channel=1
+python -m bench list                      # every instrument
+python -m bench scan                      # *IDN? every visible resource
+python -m bench check                     # ping all
+python -m bench check scope.sds1104x      # ...or just these
+python -m bench methods supply.keithley   # what you can call
+python -m bench call scope.sds1104x measure_all 4
+python -m bench call supply.keysight set_voltage 3.3 channel=1
 ```
 
 `call` passes positional values and `key=value` pairs straight through to the
@@ -432,10 +440,10 @@ all.
 **Read-only, against real instruments:**
 
 ```bash
-python3 -m bench check scope.sds1104x funcgen.agilent
-python3 -m bench call scope.sds1104x measure_all 4
-python3 -m bench call funcgen.agilent settings
-python3 -c "
+python -m bench check scope.sds1104x funcgen.agilent
+python -m bench call scope.sds1104x measure_all 4
+python -m bench call funcgen.agilent settings
+python -c "
 from bench import Bench
 with Bench() as b:
     t, v = b.scope.sds1104x.get_waveform(4)

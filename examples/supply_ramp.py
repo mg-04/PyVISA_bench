@@ -4,7 +4,7 @@ The same code drives any supply on the bench — a single-output Keithley and a
 three-output Keysight take identical calls, because the channel is a keyword
 that defaults to 1. Change ``SUPPLY`` / ``CHANNEL`` and nothing else moves.
 
-    python3 examples/supply_ramp.py
+    python examples/supply_ramp.py
 
 This one does enable a supply output.
 """

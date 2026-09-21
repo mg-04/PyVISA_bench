@@ -3,7 +3,7 @@
 Outputs a sine from the Agilent 33220A, measures it on channel 4 of the
 Siglent scope, and checks that what comes back matches what was commanded.
 
-    python3 examples/sine_loopback_test.py
+    python examples/sine_loopback_test.py
 
 Needs a cable from the generator's OUTPUT to scope channel 4. No power
 supply is touched. Exits non-zero if any check fails.
